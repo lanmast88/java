@@ -9,25 +9,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import ru.mirea.insurance.util.ConnectionSource;
 import ru.mirea.insurance.util.DatabaseManager;
 
-/**
- * Проверяет, что контекст поднимается и настройки БД читаются
- * (реального подключения к PostgreSQL тест не требует).
- */
 @SpringBootTest
 @ActiveProfiles("test")
 class AppTest {
 
     @Autowired
-    private DatabaseManager databaseManager;
+    private DataSource dataSource;
 
     @Autowired
-    private DataSource dataSource;
+    private ConnectionSource connectionSource;
 
     @Test
     void contextLoads() {
-        assertThat(databaseManager).isNotNull();
         assertThat(dataSource).isNotNull();
+        assertThat(connectionSource).isInstanceOf(DatabaseManager.class);
     }
 }
