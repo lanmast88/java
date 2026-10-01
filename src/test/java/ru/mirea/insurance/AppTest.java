@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import ru.mirea.insurance.util.ConnectionSource;
+import ru.mirea.insurance.util.DatabaseManager;
+
 @SpringBootTest
 @ActiveProfiles("test")
 class AppTest {
@@ -16,8 +19,12 @@ class AppTest {
     @Autowired
     private DataSource dataSource;
 
+    @Autowired
+    private ConnectionSource connectionSource;
+
     @Test
     void contextLoads() {
         assertThat(dataSource).isNotNull();
+        assertThat(connectionSource).isInstanceOf(DatabaseManager.class);
     }
 }

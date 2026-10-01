@@ -1,50 +1,34 @@
 package ru.mirea.insurance.util;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
-import java.util.Properties;
 
-public final class DatabaseManager {
-    private static final Properties ENV = loadEnvFile(Path.of(".env"));
+import javax.sql.DataSource;
 
-    private static final String URL = require("DB_URL");
-    private static final String USER = require("DB_USER");
-    private static final String PASSWORD = require("DB_PASSWORD");
+import org.springframework.stereotype.Component;
 
-    private DatabaseManager() {
+@Component
+public class DatabaseManager implements ConnectionSource {
+    private final DataSource dataSource;
+
+    public DatabaseManager(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+    /** Вызывающий обязан закрыть соединение: try-with-resources вернёт его в пул. */
+    @Override
+    public Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
     }
 
-    private static Properties loadEnvFile(Path path) {
-        Properties properties = new Properties();
-        if (Files.exists(path)) {
-            try (Reader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-                properties.load(reader);
-            } catch (IOException e) {
-                throw new IllegalStateException("Не удалось прочитать " + path, e);
-            }
+    public String describeConnection() {
+        try (Connection connection = getConnection()) {
+            DatabaseMetaData metaData = connection.getMetaData();
+            return metaData.getURL() + " (" + metaData.getDatabaseProductName()
+                    + " " + metaData.getDatabaseProductVersion() + ")";
+        } catch (SQLException e) {
+            return "нет подключения — " + e.getMessage();
         }
-        return properties;
-    }
-
-    // Переменная окружения ОС важнее .env — так можно переопределить значение без правки файла
-    private static String require(String key) {
-        String value = System.getenv(key);
-        if (value == null || value.isBlank()) {
-            value = ENV.getProperty(key);
-        }
-        if (value == null || value.isBlank()) {
-            throw new IllegalStateException("Не задан параметр " + key + " в .env или переменных окружения");
-        }
-        return value;
     }
 }
