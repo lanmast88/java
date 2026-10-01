@@ -1,0 +1,23 @@
+spring:
+  # Читаем .env как обычный properties-файл: синтаксис KEY=VALUE совпадает.
+  # optional: — не падать, если файла нет (например, в CI или на сервере).
+  config:
+    import: optional:file:.env[.properties]
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/insurance}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:}
+  sql:
+    init:
+      # Схему накатываем вручную (psql -f db/schema.sql), иначе CREATE TABLE
+      # упадёт при втором запуске. Поставьте always, чтобы Boot делал это сам.
+      mode: never
+      schema-locations: file:db/schema.sql
+      data-locations: file:db/data.sql
+  main:
+    # Баннер и логи мешают читать консольное меню.
+    banner-mode: "off"
+
+logging:
+  level:
+    root: warn
