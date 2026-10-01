@@ -1,4 +1,4 @@
-package ru.mirea.insurance.ui.console;
+package ru.mirea.insurance.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -7,6 +7,11 @@ import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Форматирование денег и дат: суммы с двумя знаками и разделителем разрядов,
+ * даты в виде ДД.ММ.ГГГГ. Лежит в util, потому что нужно и меню, и текстам
+ * бизнес-исключений.
+ */
 public final class Formats {
     public static final String CURRENCY = "₽";
     public static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd.MM.uuuu");

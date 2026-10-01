@@ -7,8 +7,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.util.List;
 import java.util.Scanner;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+
+import ru.mirea.insurance.util.Formats;
 
 public class ConsoleReader {
     private static final DateTimeFormatter DATE = Formats.DATE.withResolverStyle(ResolverStyle.STRICT);
@@ -53,6 +57,29 @@ public class ConsoleReader {
             }
             printer.error("введите число от 1 до " + max);
         }
+    }
+
+    /** Пункт меню: 0 — выход/назад, поэтому ноль здесь допустим. */
+    public int readMenu(String prompt, int max) {
+        while (true) {
+            String input = readLine(prompt);
+            if (input.matches("\\d{1,9}")) {
+                int choice = Integer.parseInt(input);
+                if (choice >= 0 && choice <= max) {
+                    return choice;
+                }
+            }
+            printer.error("нет такого пункта меню, введите число от 0 до " + max);
+        }
+    }
+
+    /** Значение enum выбирается номером из списка — руками константы не вводят. */
+    public <E extends Enum<E>> E readEnum(String title, List<E> values, Function<E, String> label) {
+        printer.info(title);
+        for (int i = 0; i < values.size(); i++) {
+            printer.line("    " + (i + 1) + ". " + label.apply(values.get(i)));
+        }
+        return values.get(readChoice("Номер: ", values.size()) - 1);
     }
 
     public String readRequired(String prompt, String emptyError) {
