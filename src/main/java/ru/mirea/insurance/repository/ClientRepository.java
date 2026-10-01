@@ -34,6 +34,8 @@ public class ClientRepository {
             return clients;
         } catch (SQLException e) {
             throw new DataAccessException("Не удалось получить список клиентов", e);
+        } catch (IllegalArgumentException e) {
+            throw new DataAccessException("В таблице clients некорректная строка", e);
         }
     }
 

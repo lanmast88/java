@@ -8,6 +8,9 @@ public class Client {
     private String phone;
 
     public Client(int id, String lastName, String firstName, String phone) {
+        if (id < 0) {
+            throw new IllegalArgumentException("Идентификатор клиента не может быть отрицательным");
+        }
         this.id = id;
         this.lastName = requireText(lastName, "Фамилия страхователя обязательна");
         this.firstName = requireText(firstName, "Имя страхователя обязательно");
