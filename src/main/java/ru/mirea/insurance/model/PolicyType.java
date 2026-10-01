@@ -5,8 +5,8 @@ import java.math.BigDecimal;
 public enum PolicyType {
     OSAGO("ОСАГО", "0.05"),
     KASKO("КАСКО", "0.08"),
-    DMS("ДМС", "0.03"),
-    PROPERTY("Имущество", "0.02");
+    DMS("ДМС", "0.04"),
+    PROPERTY("Имущество", "0.03");
 
     private final String title;
     private final BigDecimal baseRate;
