@@ -1,42 +1,23 @@
 package ru.mirea.insurance.util;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import javax.sql.DataSource;
+public final class DatabaseManager {
+    private static final String URL = envOrDefault("DB_URL", "jdbc:postgresql://localhost:5432/insurance");
+    private static final String USER = envOrDefault("DB_USER", "postgres");
+    private static final String PASSWORD = envOrDefault("DB_PASSWORD", "postgres");
 
-import org.springframework.stereotype.Component;
-
-/**
- * Доступ к JDBC-соединениям. DataSource создаёт Spring Boot по настройкам
- * spring.datasource.* из application.yml; за ним стоит пул HikariCP, поэтому
- * getConnection() берёт готовое соединение, а close() возвращает его в пул.
- */
-@Component
-public class DatabaseManager {
-    private final DataSource dataSource;
-
-    public DatabaseManager(DataSource dataSource) {
-        this.dataSource = dataSource;
+    private DatabaseManager() {
     }
 
-    /**
-     * Соединение для репозиториев. Вызывающий обязан закрыть его —
-     * try (Connection connection = databaseManager.getConnection()) { ... }
-     */
-    public Connection getConnection() throws SQLException {
-        return dataSource.getConnection();
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 
-    /** Строка «БД и версия сервера» для стартовой проверки подключения. */
-    public String describeConnection() {
-        try (Connection connection = getConnection()) {
-            DatabaseMetaData metaData = connection.getMetaData();
-            return metaData.getURL() + " (" + metaData.getDatabaseProductName()
-                    + " " + metaData.getDatabaseProductVersion() + ")";
-        } catch (SQLException e) {
-            return "нет подключения — " + e.getMessage();
-        }
+    private static String envOrDefault(String name, String defaultValue) {
+        String value = System.getenv(name);
+        return value == null || value.isBlank() ? defaultValue : value;
     }
 }
